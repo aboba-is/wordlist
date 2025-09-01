@@ -1,0 +1,40 @@
+id: wordpress-user-registration-check
+
+info:
+  name: WordPress user registration enabled with fallback POST
+  author: Ratnadip Gajbhiye, ritikchaddha
+  severity: info
+  metadata:
+    max-request: 2
+  tags: wordpress
+
+http:
+  - method: GET
+    path:
+      - '{{BaseURL}}/wp-login.php?action=register'
+      - '{{BaseURL}}/wp-signup.php'
+
+    host-redirects: true
+    max-redirects: 4
+    matchers-condition: or
+    matchers:
+      - type: dsl
+        dsl:
+          - 'contains_any(body, "Register For This", "register_form_message", "registerform", "signup-form", "signup_form", "login-action-register", "-register")'
+          - 'contains_any(body, "/wp-includes", "/wp-content")'
+          - 'status_code == 200'
+
+  - method: POST
+    path:
+      - '{{BaseURL}}/wp-login.php?action=register'
+    body: |
+      user_login=aboba
+    headers:
+      Content-Type: application/x-www-form-urlencoded
+    matchers-condition: or
+    matchers:
+      - type: dsl
+        dsl:
+          - 'contains_any(body, "Register For This", "register_form_message", "registerform", "signup-form", "signup_form", "login-action-register", "-register")'
+          - 'contains_any(body, "/wp-includes", "/wp-content")'
+          - 'status_code == 200'
