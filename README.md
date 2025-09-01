@@ -1,1 +1,1 @@
-# wordlist
+# wordlists
